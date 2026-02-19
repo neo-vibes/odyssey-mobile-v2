@@ -1,0 +1,174 @@
+{
+  "project": "odyssey-mobile-v2",
+  "spec": "SPEC.md",
+  "tasks": [
+    {
+      "id": "setup",
+      "name": "Project init with Expo + TypeScript",
+      "deps": [],
+      "prompt": "Initialize a React Native project using Expo with TypeScript template. Install core dependencies: @react-navigation/native, @react-navigation/native-stack, @react-navigation/bottom-tabs, react-native-screens, react-native-safe-area-context, zustand, @solana/web3.js, zod, expo-secure-store. Set up ESLint and Prettier. Create src/ directory structure: types/, services/, screens/, components/, navigation/, hooks/, store/.",
+      "acceptance": [
+        "Expo TypeScript project created and runs with 'npx expo start'",
+        "All dependencies installed",
+        "ESLint + Prettier configured and passing",
+        "Directory structure created"
+      ],
+      "estimatedIterations": 5
+    },
+    {
+      "id": "types",
+      "name": "TypeScript types + Zod schemas",
+      "deps": ["setup"],
+      "prompt": "Define TypeScript types and Zod schemas for: Wallet (publicKey, createdAt, name), StoredWallet (wallet + credentialId), Agent (id, name, pairedAt, lastSeen, status), Session (id, agentId, walletPubkey, sessionPubkey, limits, durationSeconds, createdAt, expiresAt, status, spent), SpendingLimit (mint, amount, decimals, symbol), Transaction (signature, type, from, to, amount, mint, symbol, timestamp, status, sessionId), TokenBalance, API responses, Navigation param lists.",
+      "acceptance": [
+        "All types exported from src/types/index.ts",
+        "Zod schemas for all API response types",
+        "Navigation types (RootStackParamList, MainTabParamList)",
+        "No 'any' types",
+        "TypeScript compiles without errors"
+      ],
+      "estimatedIterations": 5
+    },
+    {
+      "id": "services-api",
+      "name": "Odyssey API client",
+      "deps": ["types"],
+      "prompt": "Create HTTP client for Odyssey API at src/services/api.ts. Endpoints: POST /api/pairing/request, GET /api/pairing/{requestId}, POST /api/request-session, GET /api/session-details/{requestId}, POST /api/session/transfer, POST /api/session/transfer-token, POST /api/session/sign-and-send. Use Zod schemas to validate responses. Proper error handling with typed errors.",
+      "acceptance": [
+        "All Odyssey API endpoints implemented",
+        "Response validation with Zod",
+        "Typed error handling",
+        "Exported as api object with namespaced methods"
+      ],
+      "estimatedIterations": 8
+    },
+    {
+      "id": "services-solana",
+      "name": "Solana RPC service",
+      "deps": ["types"],
+      "prompt": "Create Solana service at src/services/solana.ts. Functions: getConnection(), getSolBalance(publicKey), getTokenBalances(publicKey), buildTransferSolTransaction(from, to, amount), getRecentBlockhash(), sendTransaction(), confirmTransaction(), isValidAddress(), shortenAddress(). Use @solana/web3.js. Default to devnet.",
+      "acceptance": [
+        "All functions implemented",
+        "Connection management",
+        "Balance fetching for SOL and SPL tokens",
+        "Transaction building utilities",
+        "Address validation helpers"
+      ],
+      "estimatedIterations": 8
+    },
+    {
+      "id": "navigation",
+      "name": "React Navigation setup",
+      "deps": ["setup"],
+      "prompt": "Set up React Navigation with: Bottom tabs (Wallet, Agents, Settings), Stack navigator for detail screens (AgentDetail, SessionDetail, Send, Receive, PairAgent, ApproveSession). Create placeholder screens for each. Dark theme (#0a0a0a background). Type-safe navigation using the types from src/types/.",
+      "acceptance": [
+        "Tab navigator with 3 tabs",
+        "Stack navigator with all screens",
+        "Type-safe navigation props",
+        "Dark theme applied",
+        "Placeholder screens render without errors"
+      ],
+      "estimatedIterations": 5
+    },
+    {
+      "id": "onboarding",
+      "name": "Passkey wallet creation flow",
+      "deps": ["navigation", "services-api"],
+      "prompt": "Create OnboardingScreen with: Welcome view with app branding, feature highlights (passkey security, agent sessions, instant transfers), 'Create Wallet with Passkey' button, loading state during creation, success state with navigation to Main. Store wallet in expo-secure-store. For now, simulate passkey creation (TODO: integrate real Lazorkit).",
+      "acceptance": [
+        "Welcome screen with branding",
+        "Create wallet button triggers flow",
+        "Loading and success states",
+        "Wallet stored in secure storage",
+        "Navigates to Main on success"
+      ],
+      "estimatedIterations": 10
+    },
+    {
+      "id": "wallet-screen",
+      "name": "Wallet screen with balance, send, receive",
+      "deps": ["services-solana", "navigation"],
+      "prompt": "Create WalletScreen showing: SOL balance card with address, Send/Receive action buttons, token list with balances. Create SendScreen with recipient input, amount input, validation, send button. Create ReceiveScreen with QR code placeholder, address display, copy/share buttons. Pull-to-refresh for balances.",
+      "acceptance": [
+        "Balance card with SOL amount",
+        "Token list",
+        "Send screen with validation",
+        "Receive screen with copy/share",
+        "Pull-to-refresh works",
+        "Navigation between screens works"
+      ],
+      "estimatedIterations": 12
+    },
+    {
+      "id": "agents-screen",
+      "name": "Agents list and pairing",
+      "deps": ["services-api", "navigation"],
+      "prompt": "Create AgentsScreen showing: List of paired agents with status indicators, 'Pair' button in header. Create PairAgentScreen with: code input, submit button, waiting state (polls for approval), success/error states. Display agent name, last seen, active/inactive status.",
+      "acceptance": [
+        "Agent list with status indicators",
+        "Pair button navigates to PairAgentScreen",
+        "Pairing flow with code input",
+        "Polling for approval status",
+        "Success/error handling"
+      ],
+      "estimatedIterations": 10
+    },
+    {
+      "id": "agent-detail",
+      "name": "Agent detail with sessions list",
+      "deps": ["agents-screen"],
+      "prompt": "Create AgentDetailScreen showing: Agent info card (name, paired date, status), sessions list with status/limits/spent, unpair button with confirmation. Tapping session navigates to SessionDetail. Pull-to-refresh.",
+      "acceptance": [
+        "Agent info card",
+        "Sessions list with status",
+        "Unpair confirmation dialog",
+        "Navigation to session detail",
+        "Pull-to-refresh"
+      ],
+      "estimatedIterations": 10
+    },
+    {
+      "id": "session-detail",
+      "name": "Session detail with transaction log",
+      "deps": ["agent-detail"],
+      "prompt": "Create SessionDetailScreen showing: Status banner, spending progress bar (spent vs limit), session info (limit, duration, expiry), transaction log list, revoke button for active sessions. Show tx signature, amount, recipient, timestamp, status.",
+      "acceptance": [
+        "Status banner",
+        "Spending progress visualization",
+        "Transaction history list",
+        "Revoke button with confirmation",
+        "All session info displayed"
+      ],
+      "estimatedIterations": 10
+    },
+    {
+      "id": "approve-session",
+      "name": "Session approval modal",
+      "deps": ["agents-screen"],
+      "prompt": "Create ApproveSessionScreen (presented as modal): Shows agent name, requested limit, duration. Warning text explaining what approval means. Approve/Reject buttons. Loading state during approval. Success/error result. This is triggered when agent requests a session.",
+      "acceptance": [
+        "Modal presentation",
+        "Request details displayed",
+        "Warning message",
+        "Approve/Reject actions",
+        "Loading and result states"
+      ],
+      "estimatedIterations": 8
+    },
+    {
+      "id": "integration",
+      "name": "Integration and polish",
+      "deps": ["onboarding", "wallet-screen", "agent-detail", "session-detail", "approve-session"],
+      "prompt": "Final integration: Wire up navigation so onboarding checks for existing wallet. Add Settings screen with wallet info and logout. Ensure all screens compile, lint passes, TypeScript strict. Test full flow manually: launch → onboarding → wallet → agents → pair → sessions.",
+      "acceptance": [
+        "Onboarding checks for existing wallet",
+        "Settings screen with wallet info",
+        "All TypeScript compiles",
+        "ESLint passes",
+        "Full navigation flow works"
+      ],
+      "estimatedIterations": 10
+    }
+  ],
+  "mergeOrder": ["setup", "types", "navigation", "services-api", "services-solana", "onboarding", "wallet-screen", "agents-screen", "agent-detail", "session-detail", "approve-session", "integration"]
+}
