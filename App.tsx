@@ -1,25 +1,32 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { RootNavigator } from './src/navigation';
+
+/**
+ * Dark theme for React Navigation
+ */
+const DarkTheme = {
+  ...DefaultTheme,
+  dark: true,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: '#7c3aed',
+    background: '#0a0a0a',
+    card: '#0a0a0a',
+    text: '#ffffff',
+    border: '#1a1a1a',
+    notification: '#7c3aed',
+  },
+};
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Odyssey Mobile</Text>
-      <StatusBar style="light" />
-    </View>
+    <SafeAreaProvider>
+      <NavigationContainer theme={DarkTheme}>
+        <RootNavigator />
+        <StatusBar style="light" />
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0a0a0a',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  text: {
-    color: '#ffffff',
-    fontSize: 24,
-    fontWeight: '600',
-  },
-});

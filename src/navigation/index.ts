@@ -1,2 +1,3 @@
 // React Navigation setup
-export {};
+export { RootNavigator } from './RootNavigator';
+export { TabNavigator } from './TabNavigator';

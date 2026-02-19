@@ -1,2 +1,7 @@
 // Type definitions and Zod schemas
-export {};
+export type {
+  RootStackParamList,
+  TabParamList,
+  RootStackScreenProps,
+  TabScreenProps,
+} from './navigation';
