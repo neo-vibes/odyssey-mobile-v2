@@ -7,6 +7,9 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
  * Contains both tab navigator and detail screens
  */
 export type RootStackParamList = {
+  // Onboarding (shown if no wallet exists)
+  Onboarding: undefined;
+
   // Tab Navigator (main bottom tabs)
   Main: NavigatorScreenParams<TabParamList>;
 

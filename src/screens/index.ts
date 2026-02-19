@@ -1,4 +1,5 @@
 // Screen components
+export { OnboardingScreen } from './OnboardingScreen';
 export { WalletScreen } from './WalletScreen';
 export { AgentsScreen } from './AgentsScreen';
 export { SettingsScreen } from './SettingsScreen';
