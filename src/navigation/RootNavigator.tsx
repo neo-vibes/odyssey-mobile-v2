@@ -59,7 +59,6 @@ export function RootNavigator() {
         contentStyle: {
           backgroundColor: '#0a0a0a',
         },
-        headerShadowVisible: false,
       }}
     >
       <Stack.Screen
