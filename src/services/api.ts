@@ -11,6 +11,7 @@ import {
   SessionDetailsResponseSchema,
   TransferResponseSchema,
   SpendingLimitSchema,
+  SessionSchema,
   ApiErrorSchema,
   type PairingRequestResponse,
   type PairingStatusResponse,
@@ -216,6 +217,28 @@ const SignAndSendResponseSchema = z.object({
 
 type SignAndSendResponse = z.infer<typeof SignAndSendResponseSchema>;
 
+// Session approve params
+interface SessionApproveParams {
+  requestId: string;
+  walletPubkey: string;
+  signature: string; // Signed approval from wallet
+}
+
+// Session approve response schema
+const SessionApproveResponseSchema = z.object({
+  status: z.literal('approved'),
+  session: SessionSchema.optional(),
+});
+
+type SessionApproveResponse = z.infer<typeof SessionApproveResponseSchema>;
+
+// Session reject response schema
+const SessionRejectResponseSchema = z.object({
+  status: z.literal('rejected'),
+});
+
+type SessionRejectResponse = z.infer<typeof SessionRejectResponseSchema>;
+
 // ============================================================================
 // API Client
 // ============================================================================
@@ -307,6 +330,28 @@ const session = {
       body: params,
     });
   },
+
+  /**
+   * Approve a pending session request
+   * Called by mobile wallet to approve an agent's session request
+   */
+  async approve(params: SessionApproveParams): Promise<SessionApproveResponse> {
+    return request('/api/session/approve', SessionApproveResponseSchema, {
+      method: 'POST',
+      body: params,
+    });
+  },
+
+  /**
+   * Reject a pending session request
+   * Called by mobile wallet to reject an agent's session request
+   */
+  async reject(requestId: string): Promise<SessionRejectResponse> {
+    return request('/api/session/reject', SessionRejectResponseSchema, {
+      method: 'POST',
+      body: { requestId },
+    });
+  },
 };
 
 // ============================================================================
@@ -326,4 +371,7 @@ export type {
   TransferTokenParams,
   SignAndSendParams,
   SignAndSendResponse,
+  SessionApproveParams,
+  SessionApproveResponse,
+  SessionRejectResponse,
 };
